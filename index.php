@@ -3,13 +3,13 @@
 require_once('config/db_connect.php');
 
 //query for getting all data from database
-$sql = 'SELECT title, ingredients, id FROM pizzas ORDER BY created_at';
+$sql = 'SELECT title, ingredients, id, picture FROM _food ORDER BY created_at';
 
 //get results
 $result = mysqli_query($conn, $sql);
 
 //fetching the resulting rows as an array
-$pizzas = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$_food = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // free result from memory'
 mysqli_free_result($result);
@@ -29,19 +29,20 @@ mysqli_close($conn);
 <div class="container">
     <div class="row">
 
-    <?php foreach($pizzas as $pizza) : ?>
+    <?php foreach($_food as $food) : ?>
         <div class="col s6 md3"> 
         <div class="card z-depth-0">
-            <img src="img/slika.jpg" class="sarma">
+            
             <div class="card-content center">
-                <h6><?php echo htmlspecialchars($pizza['title']); ?></h6>
-                <ul><?php foreach(explode(',', $pizza['ingredients']) as $ing) : ?>
-                    <li><?php echo htmlspecialchars($ing); ?> </li>
+                <img class="center" src="<?php echo 'uploads/' . $food['picture'];?>" width="100px" height="64px">
+                <h6><?= htmlspecialchars($food['title']); ?></h6>
+                <ul><?php foreach(explode(',', $food['ingredients']) as $ing) : ?>
+                    <li><?= htmlspecialchars($ing); ?> </li>
                     <?php endforeach; ?> 
                 </ul>
             </div>
             <div class="card-action right-align">
-        <a href="details.php?id=<?php echo $pizza['id']?>" class="brand-text">more info</a>
+        <a href="details.php?id=<?= $food['id']?>" class="brand-text">more info</a>
     </div>
         </div> 
     
