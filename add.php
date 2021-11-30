@@ -1,48 +1,47 @@
+<?php
 
+include('config/db_connect.php');
 
-<?php 
+$email = $title = $ingredients = '';
+$image;
+$errors = array('email' => '', 'title' => '', 'ingredients' => '', 'image' => '');
 
-    include('config/db_connect.php');
-
-    $email = $title = $ingredients = '';
-    $image;
-    $errors = array('email'=>'', 'title'=>'', 'ingredients'=>'', 'image'=>''); 
-
-if(isset($_POST['submit']))
-{
+if (isset($_POST['submit'])) {
 
     //email validation
-    if(empty($_POST['email'])) {
+    if (empty($_POST['email'])) {
         $errors['email'] = 'Email is required <br />';
     } else {
         $email = $_POST['email'];
-        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'email must be a valid email address';
         }
     }
 
     //title validation
-    if(empty($_POST['title'])) {
+    if (empty($_POST['title'])) {
         $errors['title'] = 'Title is required <br />';
     } else {
         $title = $_POST['title'];
-        if(!preg_match('/^[a-zA-Z\s]+$/', $title)) {
+        if (!preg_match('/^[a-zA-Z\s]+$/', $title)) {
             $errors['title'] = "Title must be letters and spaces only";
         }
     }
-       
+
 
     //ingredients validation
-    if(empty($_POST['ingredients'])) {
+    if (empty($_POST['ingredients'])) {
         $errors['ingredients'] = 'Ingredients are required <br />';
     } else {
         $ingredients = $_POST['ingredients'];
-        if(!preg_match('/^([a-zA-Z\s]+)(,\s*[a-zA-Z\s]*)*$/', $ingredients)) {
+        if (!preg_match('/^([a-zA-Z\s]+)(,\s*[a-zA-Z\s]*)*$/', $ingredients)) {
             $errors['ingredients'] = 'Ingredients must be a comma separated list';
         }
     }
 
-    
+    // IMAGES SETTINGS //
+
+
     if (isset($_FILES['imageToUpload'])) {
         $imgFile = $_FILES['imageToUpload'];
         // File Properties
@@ -57,36 +56,30 @@ if(isset($_POST['submit']))
 
         $allowedFiles = array('jpg', 'png');
 
-        if (in_array($fileExt, $allowedFiles)) 
-        {
-            if ($fileError == 0) 
-            {
-                if ($fileSize <= 2097152) 
-                {
+        if (in_array($fileExt, $allowedFiles)) {
+            if ($fileError == 0) {
+                if ($fileSize <= 2097152) {
                     $fileNewName = $_food['id'] . uniqid('img_') . '.' . $fileExt;
                     $fileDestination = 'uploads/' . $fileNewName;
-                     if (move_uploaded_file($fileTmpDir, $fileDestination)) 
-                     {
+                    if (move_uploaded_file($fileTmpDir, $fileDestination)) {
                         $image = $fileNewName;
                     }
-                } 
-                else 
-                {
-                    echo "file is large";
+                } else {
+                    echo "File is too large";
                 }
-            } 
-            else 
-            {
-                echo "file has errors";
+            } else {
+                echo "File has errors";
             }
+        } else {
+            echo "Unknown errors!";
         }
     }
-    
-    //image validation
 
  
-    if(array_filter($errors)) {
 
+
+    if (array_filter($errors)) {
+        echo "Errors ???";
     } else {
 
         $email = mysqli_real_escape_string($conn, $_POST['email']);
@@ -98,14 +91,13 @@ if(isset($_POST['submit']))
         $sql = "INSERT INTO _food(title, email, ingredients, picture) VALUES ('$title', '$email', '$ingredients', '$image' )";
 
         //save to db and check
-        if(mysqli_query($conn, $sql)) {
+        if (mysqli_query($conn, $sql)) {
             //success
             header('Location: index.php');
         } else {
             //error
             echo 'query error: ' . mysqli_error($conn);
         }
- 
     }
 }
 
@@ -117,7 +109,7 @@ if(isset($_POST['submit']))
 <!DOCTYPE html>
 <html>
 
-<?php include('templates/header.php'); ?> 
+<?php include('templates/header.php'); ?>
 
 <section class="container grey-text">
     <h4 class="center">
@@ -126,20 +118,20 @@ if(isset($_POST['submit']))
 
     <form class="white" action="add.php" method="POST" id="hadzo" enctype="multipart/form-data">
         <label>Your Email: </label>
-        <input type="text" name="email" value="<?php echo htmlspecialchars ($email) ?>">
+        <input type="text" name="email" value="<?php echo htmlspecialchars($email) ?>">
         <div class="red-text"> <?php echo $errors['email']; ?> </div>
         <label>Food Title: </label>
-        <input type="text" name="title" value="<?php echo htmlspecialchars ($title) ?>">
+        <input type="text" name="title" value="<?php echo htmlspecialchars($title) ?>">
         <div class="red-text"> <?php echo $errors['title']; ?> </div>
         <label>Ingredients (comma separated): </label>
-        <input type="text" name="ingredients" value="<?php echo htmlspecialchars ($ingredients) ?>">
+        <input type="text" name="ingredients" value="<?php echo htmlspecialchars($ingredients) ?>">
         <div class="red-text"> <?php echo $errors['ingredients']; ?> </div>
-        <label>Image: </label> <br> <br>
+        <label>Image (.png / .jpg): </label> <br> <br>
         <input type="file" name="imageToUpload">
-        <span id="selectedFileText">b</span>
+        <span id="selectedFileText"></span> 
         <div class="red-text"> <?php echo $errors['image']; ?> </div> <br>
         <div class="center">
-            <input type="submit" name="submit" value="submit" class="btn brand z-depth-0">
+            <input type="submit" name="submit" value="submit" class="btn brand z-depth-3">
         </div>
     </form>
 
@@ -153,4 +145,4 @@ if(isset($_POST['submit']))
         $('#selectedFileText').html('Selected File: ' + fileName);
 
     });
-    </script>
+</script>

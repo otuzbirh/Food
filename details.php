@@ -62,7 +62,7 @@
          <!-- DELETE FORM -->
          <form action="details.php" method="POST">
              <input type="hidden" name="id_to_delete" value="<?php echo $food['id'] ?>">
-             <input type="submit" name="delete" value="Delete" class="btn brand z-depth-0">
+             <input type="submit" name="delete" value="Delete" class="btn brand z-depth-3">
          </form>
      
 
